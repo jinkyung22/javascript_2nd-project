@@ -1,5 +1,6 @@
-export function createButton(option){
+export function createButton(id, option){
   var el = document.createElement("button");
+  el.id = id;
   el.textContent = option.label;
   el.onclick = option.onClick; // onClick은 콜백함수
 
