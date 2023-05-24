@@ -4,5 +4,10 @@ export function createInput(id) {
 
   return {
     el: el,
-  }
+    getValue: function () {
+      return el.value;
+    },
+    clear: function () {},
+    focus: function () {},
+  };
 }

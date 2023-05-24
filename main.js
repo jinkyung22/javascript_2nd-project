@@ -1,11 +1,11 @@
 var todolist = [];
 
 // todolist랑 donelist 일단 전역에 선언(리로드해야되니깐)
-var todolistControl;
+var todolistControl
 var donelistControl;
 
 function onClickSave () {
-  var contentsEl = document.getElementById("todoInput");
+  var contentsEl = Widget.getControl("todoInput");
   if (!contentsEl.value) {
     alert("할일을 입력해주세요");
     return;
@@ -34,11 +34,6 @@ function createcheck(data){
   return checkControl.el;
 }
 
-//필터링해주는함수
-function getSortedTodoList(option) {
-  return todolist.filter(item => item.done === option.done) // true > done
-}
-
 function createspan(data){
   var spanControl = Widget.span({
     label: "span",
@@ -48,7 +43,7 @@ function createspan(data){
 }
 
 function createbutton(data){
-  var delBtnControl = Widget.button({
+  var delBtnControl = Widget.button("delbtn",{
     label: "삭제",
     onClick: function(){
       todolist.splice(todolist.indexOf(data), 1);
@@ -58,8 +53,34 @@ function createbutton(data){
   return delBtnControl.el;
 }
 
+//필터링해주는함수
+function getSortedTodoList(option) {
+  return todolist.filter(item => item.done === option.done) // true > done
+}
+
+// todolistControl
+var todolistControl = Widget.list("todoList", {
+  datas: getSortedTodoList({ done: false }),
+  columns: [
+    {id: "done", render: createcheck},
+    {id: "todo", render: createspan},
+    {id: "delete", render: createbutton}
+  ],
+});
+
+// donelistControl
+var donelistControl = Widget.list("doneList", {
+  datas: getSortedTodoList({ done: true }),
+  columns: [
+    {id: "done", render: createcheck },
+    {id: "todo", render: createspan},
+    {id: "delete", render: createbutton}
+  ],
+})
+
+
 function reloadLists() {
-  if (todolistControl && donelistControl) {
+ if (todolistControl && donelistControl) {
     todolistControl.reload(getSortedTodoList({ done: false }));
     donelistControl.reload(getSortedTodoList({ done: true }));
   }
@@ -71,26 +92,9 @@ function render() {
 
   div.append(Widget.input("todoInput"));
   div.append(Widget.button("btnSave", { label: "입력", onClick: onClickSave }));
-  div.append(
-    Widget.list("todoList", {
-      datas: getSortedTodoList({ done: false }),
-      columns: [
-        {id: "done", render: createcheck},
-        {id: "todo", render: createspan},
-        {id: "delete", render: createbutton}
-      ],
-    })
-  );
-  div.append(
-    Widget.list("doneList", {
-      datas: getSortedTodoList({ done: true }),
-      columns: [
-        {id: "done", render: createcheck },
-        {id: "todo", render: createspan},
-        {id: "delete", render: createbutton}
-      ],
-    })
-  );
+  div.append( todolistControl );
+  div.append( donelistControl );
+
   reloadLists();
 }
 
